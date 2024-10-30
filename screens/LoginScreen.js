@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, Alert } from 'react-native';
-import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
@@ -8,21 +8,32 @@ const LoginScreen = ({ navigation }) => {
 
   const handleLogin = async () => {
     try {
-      const response = await axios.post('https://reqres.in/api/login', {
-        email,
-        password,
+      const response = await fetch('https://reqres.in/api/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          email: email,
+          password: password,
+        })
       });
-      
-      const token = response.data.token;
-      Alert.alert("Login bem-sucedido!", "Token: " + token);
-      navigation.navigate('Home', { token });
+
+      const data = await response.json()
+
+      if (response.ok) {
+        await AsyncStorage.setItem('token', data.token);
+        navigation.navigate('UserScreen');
+      } else {
+        Alert.alert('Login falhou', data.error);
+      } 
     } catch (error) {
       Alert.alert("Erro de autenticação", "Verifique as credenciais e tente novamente.");
     }
   };
 
   return (
-    <View style={{ padding: 20 }}>
+    <View style={{padding: 20 }}>
       <Text>Email:</Text>
       <TextInput
         value={email}
