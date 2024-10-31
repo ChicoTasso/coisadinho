@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, Button } from 'react-native';
+import { View, Text, FlatList, Button, TouchableOpacity } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const UsersScreen = ({ navigation }) => {
@@ -35,6 +35,14 @@ const UsersScreen = ({ navigation }) => {
     navigation.navigate('Login');
   };
 
+  const navigateToDetails = (user) => {
+    navigation.navigate('UserDetail', { user });
+  };
+
+  const navigateToUserCreate = () => {
+    navigation.navigate('UserCreate');
+  };
+
   useEffect(() => {
     fetchUsers();
   }, []);
@@ -48,13 +56,15 @@ const UsersScreen = ({ navigation }) => {
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
           <View>
-            <Text>
-              {item.first_name} {item.last_name}
-            </Text>
-            <Text>{item.email}</Text>
+            <TouchableOpacity onPress={() => navigateToDetails(item)}>
+              <Text>
+                {item.first_name} {item.last_name}
+              </Text>
+            </TouchableOpacity>
           </View>
         )}
       />
+      <Button title="Create User" onPress={navigateToUserCreate} />
     </View>
   );
 };
